@@ -1,0 +1,29 @@
+#!/bin/sh
+
+upSeconds="$(/usr/bin/cut -d. -f1 /proc/uptime)"
+secs=$((${upSeconds}%60))
+mins=$((${upSeconds}/60%60))
+hours=$((${upSeconds}/3600%24))
+days=$((${upSeconds}/86400))
+UPTIME=`printf "%d days, %02dh%02dm%02ds" "$days" "$hours" "$mins" "$secs"`
+
+# get the load averages
+read one five fifteen rest < /proc/loadavg
+
+echo "        [1;32m:,yWSN2r:       ,cK8SST;.[m
+       [1;32mS@@@08S@@@@g   @@@@@g80@@@G[m          [1;34m`date +"%A, %e %B %Y, %r"`[m
+       [1;32m,@@@@SOjzS@@U D@@EzZW@@@@@.[m          [1;34m`uname -srm`[m
+         [1;32myS@@@@@G       D@@@@@gL[m
+            [1;32m,UE   [1;31m;n27;  [1;32m.UK.[m
+         [1;31mr@@@O  L@@@@@@@: .G@@@;[m
+        [1;31m:@@:  :rc;. , :rcr.  ;@@[m            [1;36mOS.................:[m `cat /etc/os-release |grep PRETTY|awk -F '"' {'print $2'}`
+       [1;31mrc  1@@@@@@@. ;@@@@@@@r  y;[m          [1;36mUptime.............:[m ${UPTIME}
+     [1;31m,@@@ 1@@@@@@@@; 1@@@@@@@@, @@@.[m        [1;36mMemory.............:[m `cat /proc/meminfo | grep MemFree | awk {'print $2'}`kB (Free) / `cat /proc/meminfo | grep MemTotal | awk {'print $2'}`kB (Total)
+     [1;31mK@@G  U@@@@Dj     Cg@@@@j  @@@T[m        [1;36mLoad Averages......:[m ${one}, ${five}, ${fifteen} (1, 5, 15 min)
+      [1;31mTZ .      ,E@@@@S2.      . 2r[m         [1;36mRunning Processes..:[m `ps ax | wc -l | tr -d " "`
+        [1;31m@@@@$;  @@@@@@@@@  r@@@@@[m           [1;36mLAN IP Address.....:[m `ip a | grep 'global eth0' | awk '{print $2}'`
+        [1;31mC@@@@@@ r8@@@@@G, @@@@@@T[m           [1;36mWAN IP Address.....:[m `ip a | grep 'global wlan0' | awk '{print $2}'`
+          [1;31m;SD@G    ,,:    D@BE;[m
+                [1;31mN@@@@@@@U[m
+$(tput sgr0)
+"
