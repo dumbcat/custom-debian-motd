@@ -57,4 +57,6 @@ exit 2
 
 10. 重新ssh進入系統，便可以看到登入畫面。
 
-10. 如果無法讀取畫面，可以執行/usr/sbin/update-motd查詢失敗訊息，若為ERROR: could not generate new MOTD可能是登入畫面檔案中語法有錯誤
+11. 如果無法讀取畫面，可以執行/usr/sbin/update-motd查詢失敗訊息，若為ERROR: could not generate new MOTD可能是登入畫面檔案中語法有錯誤
+
+12.如果motd在登入時出現兩次，將/etc/pam.d/sshd中的session    optional     pam_motd.so  noupdate註解掉
