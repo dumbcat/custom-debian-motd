@@ -1,11 +1,20 @@
-1. 新建/usr/sbin/update-motd檔，修改權限為755。
-```
+# Customize motd for Raspberry Pi
+
+![Customize motd for Raspberry Pi](/2020-04-21_101211.png)
+
+---
+## Install Step
+
+**Step 1.** Create file `/usr/sbin/update-motd`, and change the access permissions to 755.
+
+```Shell
 $ touch /usr/sbin/update-motd
 $ chmod 755 /usr/sbin/update-motd
 ```
 
-2. 編輯/usr/sbin/update-motd內容，輸入以下script。
-```
+**Step 2.** Edit `usr/sbin/update-motd`, Enter the following script.
+
+```Bash
 #!/bin/sh
 #
 #    update-motd - update the dynamic MOTD immediately
@@ -35,28 +44,48 @@ echo "ERROR: could not generate new MOTD" 1>&2
 exit 2
 ```
 
-3. 確認/etc/pam.d/sshd中有以下內容。
-`session    optional     pam_motd.so  motd=/run/motd.dynamic`
+**Step 3.** Confirm the following content in `/etc/pam.d/sshd`.
 
-4. 確認/etc/init.d/motd中有以下內容(若系統沒有該檔案則跳過)。
-`uname -snrvm > /var/run/motd.dynamic`
+```Bash
+session    optional     pam_motd.so  motd=/run/motd.dynamic`
+```
 
-5. 關閉系統自動產生motd檔。
-`$ systemctl disable motd`
+**Step 4.** Confirm the following content in `/etc/init.d/motd`, skip if the system does not have the file.
 
-6. 移除預設的motd檔。
-`$ rm -f /etc/motd`
+```Bash
+uname -snrvm > /var/run/motd.dynamic
+```
 
-7. 建立開機讀取的motd檔。
-`$ ln -s /var/run/motd /etc/motd`
+**Step 5.** Disable automatically generate motd file.
 
-8. 建立存放motd Script的資料夾。
-`$ mkdir /etc/update-motd.d`
+```Shell
+$ systemctl disable motd
+```
 
-9. 把登入Script放到/etc/update-motd.d並修改權限為755，Script會依照檔名的順序被讀取，如10-logo, 20-sysinfo，則10-logo會先被讀取。
+**Step 6.** Remove default motd.
 
-10. 重新ssh進入系統，便可以看到登入畫面。
+```Shell
+$ rm -f /etc/motd
+```
 
-11. 如果無法讀取畫面，可以執行/usr/sbin/update-motd查詢失敗訊息，若為ERROR: could not generate new MOTD可能是登入畫面檔案中語法有錯誤
+**Step 7.** Create symbolic link for customize motd to /etc/motd.
 
-12.如果motd在登入時出現兩次，將/etc/pam.d/sshd中的session    optional     pam_motd.so  noupdate註解掉
+```Shell
+$ ln -s /var/run/motd /etc/motd
+```
+
+**Step 8.** Create folder for svae motd Script.
+
+```Shell
+$ mkdir /etc/update-motd.d
+```
+
+**Step 9.** Upload motd scripts to `/etc/update-motd.d`, and change the access permissions to 755. Scripts will be load by order of filename, i.e., 10-logo will be load before 20-sysinfo.
+
+**Step 10.** Re-connect system by ssh should see customize motd.
+
+## Troubleshooting
+
+* If load motd fail, check error message by run `/usr/sbin/update-motd`. If the message is `ERROR: could not generate new MOTD`, it's may syntax error in your motd scripts.
+
++ If motd show twice when you login, try comment out `session    optional     pam_motd.so  noupdate` in `/etc/pam.d/sshd`. **(It may not working.)**
